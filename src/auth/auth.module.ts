@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'; // Para manejar va
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
+import { RolesGuard } from './roles.guard';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy], // Añade JwtStrategy aquí
+  providers: [AuthService, JwtStrategy, RolesGuard], // Añade JwtStrategy aquí
   exports: [AuthService, JwtModule, PassportModule], // Exporta para que otros módulos puedan usar JWT y Passport
 })
 export class AuthModule {}
