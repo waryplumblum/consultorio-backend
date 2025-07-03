@@ -49,4 +49,21 @@ export class AppointmentsService {
     }
     return { message: `Cita con ID "${id}" eliminada exitosamente.` };
   }
+
+  async countAllAppointments(): Promise<number> {
+    return this.appointmentModel.countDocuments().exec();
+  }
+
+  async findUpcomingAppointments(limit: number = 5): Promise<AppointmentDocument[]> {
+    const now = new Date();
+    return this.appointmentModel
+      .find({
+        date: { $gte: now },
+        status: { $in: ['pending', 'confirmed'] } // Considera solo citas pendientes o confirmadas
+      })
+      .sort({ date: 1, time: 1 }) // Ordena por fecha y hora ascendente
+      .limit(limit) // Limita el número de resultados
+      .exec();
+  }
+
 }

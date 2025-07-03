@@ -16,6 +16,18 @@ export class AppointmentsController {
     return this.appointmentsService.create(createAppointmentDto);
   }
 
+  @Get('summary') // <--- NUEVO ENDPOINT PARA EL RESUMEN DEL DASHBOARD
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'secretary')
+  async getSummary() {
+    const totalAppointments = await this.appointmentsService.countAllAppointments();
+    const upcomingAppointments = await this.appointmentsService.findUpcomingAppointments(5); // Las próximas 5 citas
+    return {
+      totalAppointments,
+      upcomingAppointments,
+    };
+  }
+
   @Get()
   @UseGuards(AuthGuard('jwt'), RolesGuard) // Protege SOLO esta ruta GET /appointments
   @Roles('admin', 'secretary') // Solo admin o secretary pueden listar citas
