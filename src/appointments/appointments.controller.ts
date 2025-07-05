@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/auth/roles.decorator';
+import { GetAppointmentsDto } from './dto/get-appointments.dto';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -29,10 +30,16 @@ export class AppointmentsController {
   }
 
   @Get()
-  @UseGuards(AuthGuard('jwt'), RolesGuard) // Protege SOLO esta ruta GET /appointments
-  @Roles('admin', 'secretary') // Solo admin o secretary pueden listar citas
-  findAll() {
-    return this.appointmentsService.findAll();
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin', 'secretary')
+  async findAll(@Query() query: GetAppointmentsDto) {
+    const { appointments, total } = await this.appointmentsService.findAllPaginated(query); // <--- Llama al nuevo método del servicio
+    return {
+      data: appointments,
+      total,
+      page: query.page,
+      limit: query.limit,
+    };
   }
 
   @Get(':id')

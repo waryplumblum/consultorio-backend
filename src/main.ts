@@ -6,9 +6,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe({
+    transform: true, // Transforma tipos de datos (ej. string a number)
     whitelist: true, // Remueve propiedades no definidas en el DTO
     forbidNonWhitelisted: true, // Lanza error si hay propiedades no definidas
-    transform: true, // Transforma tipos de datos (ej. string a number)
     transformOptions: {
       enableImplicitConversion: true, 
     }
