@@ -39,10 +39,10 @@ export class GetAppointmentsDto {
 
   @IsOptional()
   @IsString()
-  sortBy: string = 'scheduledDateTime'; // Campo para ordenar, por defecto 'scheduledDateTime'
+  sortBy: string = 'createdAt'; // Campo para ordenar, por defecto 'scheduledDateTime'
 
   @IsOptional()
   @IsString()
   @IsIn(['asc', 'desc'])
-  sortOrder: 'asc' | 'desc' = 'asc'; // Orden de clasificación, por defecto ascendente
+  sortOrder: 'asc' | 'desc' = 'desc'; // Orden de clasificación, por defecto ascendente
 }

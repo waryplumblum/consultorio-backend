@@ -12,9 +12,17 @@ export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) { }
 
   @Post()
-  // ESTA RUTA NO LLEVA GUARDS SI ES PARA EL FORMULARIO PÚBLICO DEL PACIENTE
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentsService.create(createAppointmentDto);
+  async create(@Body() createAppointmentDto: CreateAppointmentDto) {
+    console.log('Controller: Recibida solicitud para crear una cita.');
+    console.log('Controller: DTO recibido:', createAppointmentDto)
+    try {
+      const result = await this.appointmentsService.create(createAppointmentDto);
+      console.log('Controller: Cita creada exitosamente, ID:', result._id);
+      return result;
+    } catch (error) {
+      console.error('Controller: Error al crear la cita:', error.message);
+      throw error; // Re-lanza el error para que NestJS lo maneje
+    }
   }
 
   @Get('summary') // <--- NUEVO ENDPOINT PARA EL RESUMEN DEL DASHBOARD
@@ -52,14 +60,31 @@ export class AppointmentsController {
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard) // Protege solo esta ruta PATCH /appointments/:id
   @Roles('admin', 'secretary')
-  update(@Param('id') id: string, @Body() updateAppointmentDto: UpdateAppointmentDto) {
-    return this.appointmentsService.update(id, updateAppointmentDto);
+  async update(@Param('id') id: string, @Body() updateAppointmentDto: UpdateAppointmentDto) { // Añadimos async
+    console.log(`Controller: Recibida solicitud para actualizar cita con ID: ${id}`);
+    console.log('Controller: DTO de actualización recibido:', updateAppointmentDto);
+    try {
+      const result = await this.appointmentsService.update(id, updateAppointmentDto);
+      console.log(`Controller: Cita con ID ${id} actualizada exitosamente.`);
+      return result;
+    } catch (error) {
+      console.error(`Controller: Error al actualizar cita con ID ${id}:`, error.message);
+      throw error;
+    }
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard) // Protege solo esta ruta DELETE /appointments/:id
   @Roles('admin', 'secretary')
-  remove(@Param('id') id: string) {
-    return this.appointmentsService.remove(id);
+  async remove(@Param('id') id: string) { // Añadimos async
+    console.log(`Controller: Recibida solicitud para eliminar cita con ID: ${id}`);
+    try {
+      const result = await this.appointmentsService.remove(id);
+      console.log(`Controller: Cita con ID ${id} eliminada exitosamente.`);
+      return result;
+    } catch (error) {
+      console.error(`Controller: Error al eliminar cita con ID ${id}:`, error.message);
+      throw error;
+    }
   }
 }

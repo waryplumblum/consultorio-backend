@@ -16,13 +16,17 @@ export class AppointmentsService {
   ) { }
 
   async create(createAppointmentDto: CreateAppointmentDto): Promise<AppointmentDocument> {
+    console.log('Service: Intentando crear nueva cita con DTO:', createAppointmentDto);
     const createdAppointment = new this.appointmentModel(createAppointmentDto);
-    return createdAppointment.save();
+    try {
+      const savedAppointment = await createdAppointment.save();
+      console.log('Service: Cita guardada en DB exitosamente, ID:', savedAppointment._id);
+      return savedAppointment;
+    } catch (error) {
+      console.error('Service: Error al guardar la cita en DB:', error.message);
+      throw error;
+    }
   }
-
-  /*async findAll(): Promise<Appointment[]> {
-    return this.appointmentModel.find().exec();
-  }*/
 
   async findAllPaginated(queryDto: GetAppointmentsDto): Promise<{ appointments: AppointmentDocument[], total: number }> {
     const { page, limit, sortBy, sortOrder, patientName, patientEmail, status, dateFrom, dateTo } = queryDto;
@@ -76,13 +80,21 @@ export class AppointmentsService {
   }
 
   async update(id: string, updateAppointmentDto: UpdateAppointmentDto): Promise<AppointmentDocument> {
+    console.log(`Service: Intentando actualizar cita con ID: ${id}`);
+    console.log('Service: Datos de actualización:', updateAppointmentDto);
+
+    // Si tu DTO no tiene `updatedAt`, o si quieres asegurarte, puedes añadirlo aquí
+    const dataToUpdate: any = { ...updateAppointmentDto, updatedAt: new Date() };
+
     const existingAppointment = await this.appointmentModel
-      .findByIdAndUpdate(id, { $set: updateAppointmentDto }, { new: true })
+      .findByIdAndUpdate(id, { $set: dataToUpdate }, { new: true })
       .exec();
 
     if (!existingAppointment) {
+      console.warn(`Service: Cita con ID "${id}" no encontrada durante la actualización.`);
       throw new NotFoundException(`Cita con ID "${id}" no encontrada para actualizar.`);
     }
+    console.log(`Service: Cita con ID ${id} actualizada en DB.`);
     return existingAppointment;
   }
 
