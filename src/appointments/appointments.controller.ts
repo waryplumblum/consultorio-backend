@@ -38,8 +38,8 @@ export class AppointmentsController {
   }
 
   @Get()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('admin', 'secretary')
+  //@UseGuards(AuthGuard('jwt'), RolesGuard)
+  //@Roles('admin', 'secretary')
   async findAll(@Query() query: GetAppointmentsDto) {
     const { appointments, total } = await this.appointmentsService.findAllPaginated(query); // <--- Llama al nuevo método del servicio
     return {
