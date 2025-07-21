@@ -9,10 +9,12 @@ import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Appointment.name, schema: AppointmentSchema }]),
+    MongooseModule.forFeature([
+      { name: Appointment.name, schema: AppointmentSchema },
+    ]),
     MailModule,
   ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],
 })
-export class AppointmentsModule { }
+export class AppointmentsModule {}

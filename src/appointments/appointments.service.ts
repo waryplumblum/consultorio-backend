@@ -5,25 +5,36 @@ import { Model } from 'mongoose';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
-import { Appointment, AppointmentDocument } from './entities/appointment.entity';
+import {
+  Appointment,
+  AppointmentDocument,
+} from './entities/appointment.entity';
 import { GetAppointmentsDto } from './dto/get-appointments.dto';
 
 import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AppointmentsService {
-
   constructor(
-    @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
+    @InjectModel(Appointment.name)
+    private appointmentModel: Model<AppointmentDocument>,
     private mailService: MailService,
-  ) { }
+  ) {}
 
-  async create(createAppointmentDto: CreateAppointmentDto): Promise<AppointmentDocument> {
-    console.log('Service: Intentando crear nueva cita con DTO:', createAppointmentDto);
+  async create(
+    createAppointmentDto: CreateAppointmentDto,
+  ): Promise<AppointmentDocument> {
+    console.log(
+      'Service: Intentando crear nueva cita con DTO:',
+      createAppointmentDto,
+    );
     const createdAppointment = new this.appointmentModel(createAppointmentDto);
     try {
       const savedAppointment = await createdAppointment.save();
-      console.log('Service: Cita guardada en DB exitosamente, ID:', savedAppointment._id);
+      console.log(
+        'Service: Cita guardada en DB exitosamente, ID:',
+        savedAppointment._id,
+      );
 
       await this.mailService.sendAppointmentNotification(savedAppointment);
 
@@ -34,8 +45,20 @@ export class AppointmentsService {
     }
   }
 
-  async findAllPaginated(queryDto: GetAppointmentsDto): Promise<{ appointments: AppointmentDocument[], total: number }> {
-    const { page, limit, sortBy, sortOrder, patientName, patientEmail, status, dateFrom, dateTo } = queryDto;
+  async findAllPaginated(
+    queryDto: GetAppointmentsDto,
+  ): Promise<{ appointments: AppointmentDocument[]; total: number }> {
+    const {
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+      patientName,
+      patientEmail,
+      status,
+      dateFrom,
+      dateTo,
+    } = queryDto;
 
     const skip = (page - 1) * limit;
     const sort = {};
@@ -66,7 +89,8 @@ export class AppointmentsService {
     }
 
     const [appointments, total] = await Promise.all([
-      this.appointmentModel.find(filter)
+      this.appointmentModel
+        .find(filter)
         .sort(sort)
         .skip(skip)
         .limit(limit)
@@ -85,29 +109,41 @@ export class AppointmentsService {
     return appointment;
   }
 
-  async update(id: string, updateAppointmentDto: UpdateAppointmentDto): Promise<AppointmentDocument> {
+  async update(
+    id: string,
+    updateAppointmentDto: UpdateAppointmentDto,
+  ): Promise<AppointmentDocument> {
     console.log(`Service: Intentando actualizar cita con ID: ${id}`);
     console.log('Service: Datos de actualización:', updateAppointmentDto);
 
     // Si tu DTO no tiene `updatedAt`, o si quieres asegurarte, puedes añadirlo aquí
-    const dataToUpdate: any = { ...updateAppointmentDto, updatedAt: new Date() };
+    const dataToUpdate: any = {
+      ...updateAppointmentDto,
+      updatedAt: new Date(),
+    };
 
     const existingAppointment = await this.appointmentModel
       .findByIdAndUpdate(id, { $set: dataToUpdate }, { new: true })
       .exec();
 
     if (!existingAppointment) {
-      console.warn(`Service: Cita con ID "${id}" no encontrada durante la actualización.`);
-      throw new NotFoundException(`Cita con ID "${id}" no encontrada para actualizar.`);
+      console.warn(
+        `Service: Cita con ID "${id}" no encontrada durante la actualización.`,
+      );
+      throw new NotFoundException(
+        `Cita con ID "${id}" no encontrada para actualizar.`,
+      );
     }
     console.log(`Service: Cita con ID ${id} actualizada en DB.`);
     return existingAppointment;
   }
 
-  async remove(id: string): Promise<any> { // Puede devolver un objeto con `{ deletedCount: 1 }`
+  async remove(id: string): Promise<any> {
     const result = await this.appointmentModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0) {
-      throw new NotFoundException(`Cita con ID "${id}" no encontrada para eliminar.`);
+      throw new NotFoundException(
+        `Cita con ID "${id}" no encontrada para eliminar.`,
+      );
     }
     return { message: `Cita con ID "${id}" eliminada exitosamente.` };
   }
@@ -116,16 +152,17 @@ export class AppointmentsService {
     return this.appointmentModel.countDocuments().exec();
   }
 
-  async findUpcomingAppointments(limit: number = 5): Promise<AppointmentDocument[]> {
+  async findUpcomingAppointments(
+    limit: number = 5,
+  ): Promise<AppointmentDocument[]> {
     const now = new Date();
     return this.appointmentModel
       .find({
         scheduledDateTime: { $gte: now },
-        status: { $in: ['pending', 'confirmed'] } // Considera solo citas pendientes o confirmadas
+        status: { $in: ['pending', 'confirmed'] }, // Considera solo citas pendientes o confirmadas
       })
       .sort({ scheduledDateTime: 1 })
       .limit(limit) // Limita el número de resultados
       .exec();
   }
-
 }
