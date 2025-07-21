@@ -10,11 +10,14 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 
 import { ConfigModule } from '@nestjs/config';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+
+import { APP_GUARD, Reflector } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Hace que ConfigModule esté disponible globalmente
+      isGlobal: true,
     }),
     MongooseModule.forRoot('mongodb://localhost/consultorio_db'),
     AppointmentsModule,
@@ -22,6 +25,13 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useFactory: (reflector: Reflector) => new JwtAuthGuard(reflector),
+      inject: [Reflector],
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}

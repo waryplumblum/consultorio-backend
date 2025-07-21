@@ -16,11 +16,13 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from 'src/auth/roles.decorator';
 import { GetAppointmentsDto } from './dto/get-appointments.dto';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
+  @Public()
   @Post()
   async create(@Body() createAppointmentDto: CreateAppointmentDto) {
     console.log('Controller: Recibida solicitud para crear una cita.');
@@ -34,6 +36,12 @@ export class AppointmentsController {
       console.error('Controller: Error al crear la cita:', error.message);
       throw error;
     }
+  }
+
+  @Public()
+  @Get('future')
+  async getFutureAppointments() {
+    return this.appointmentsService.findFutureAppointmentsForPublic();
   }
 
   @Get('summary')
@@ -50,6 +58,7 @@ export class AppointmentsController {
     };
   }
 
+  @Public()
   @Get()
   async findAll(@Query() query: GetAppointmentsDto) {
     const { appointments, total } =
@@ -117,10 +126,5 @@ export class AppointmentsController {
       );
       throw error;
     }
-  }
-
-   @Get('future')
-  async getFutureAppointments() {
-    return this.appointmentsService.findFutureAppointmentsForPublic(); // Usar un nuevo método específico en el servicio
   }
 }
