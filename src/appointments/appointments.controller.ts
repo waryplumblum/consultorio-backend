@@ -118,4 +118,9 @@ export class AppointmentsController {
       throw error;
     }
   }
+
+   @Get('future')
+  async getFutureAppointments() {
+    return this.appointmentsService.findFutureAppointmentsForPublic(); // Usar un nuevo método específico en el servicio
+  }
 }

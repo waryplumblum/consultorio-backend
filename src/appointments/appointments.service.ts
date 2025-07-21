@@ -165,4 +165,15 @@ export class AppointmentsService {
       .limit(limit) // Limita el número de resultados
       .exec();
   }
+
+  async findFutureAppointmentsForPublic(): Promise<AppointmentDocument[]> {
+    const now = new Date();
+    return this.appointmentModel
+      .find({
+        scheduledDateTime: { $gte: now },
+        status: { $in: ['pending', 'confirmed'] },
+      })
+      .sort({ scheduledDateTime: 1 })
+      .exec();
+  }
 }
