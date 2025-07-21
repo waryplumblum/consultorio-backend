@@ -8,11 +8,14 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Appointment, AppointmentDocument } from './entities/appointment.entity';
 import { GetAppointmentsDto } from './dto/get-appointments.dto';
 
+import { MailService } from 'src/mail/mail.service';
+
 @Injectable()
 export class AppointmentsService {
 
   constructor(
     @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
+    private mailService: MailService,
   ) { }
 
   async create(createAppointmentDto: CreateAppointmentDto): Promise<AppointmentDocument> {
@@ -21,6 +24,9 @@ export class AppointmentsService {
     try {
       const savedAppointment = await createdAppointment.save();
       console.log('Service: Cita guardada en DB exitosamente, ID:', savedAppointment._id);
+
+      await this.mailService.sendAppointmentNotification(savedAppointment);
+
       return savedAppointment;
     } catch (error) {
       console.error('Service: Error al guardar la cita en DB:', error.message);
