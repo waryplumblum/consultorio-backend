@@ -5,18 +5,16 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/roles.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { Public } from 'src/auth/public.decorator';
 
-// Protege todas las rutas de este controlador.
-// Solo los administradores pueden gestionar usuarios.
-@UseGuards(AuthGuard('jwt'), RolesGuard) // AuthGuard primero, luego RolesGuard
-@Roles('admin') // Solo 'admin' puede acceder a este controlador
+@UseGuards(AuthGuard('jwt'), RolesGuard) 
+@Roles('admin')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
+  //@Public()
   @Post()
-  // Si queremos que los administradores puedan crear otros usuarios (secretarias/admins)
-  // sin necesidad de un endpoint de registro público separado, lo protegemos aquí.
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -37,7 +35,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT) // Devolver 204 No Content para eliminación exitosa
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
