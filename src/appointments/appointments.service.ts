@@ -78,13 +78,10 @@ export class AppointmentsService {
     if (dateFrom || dateTo) {
       filter.scheduledDateTime = {};
       if (dateFrom) {
-        filter.scheduledDateTime.$gte = dateFrom;
+        filter.scheduledDateTime.$gte = new Date(dateFrom);
       }
       if (dateTo) {
-        // Para incluir todo el día de `dateTo`, sumamos un día y buscamos menor que
-        const endOfDay = new Date(dateTo);
-        endOfDay.setDate(endOfDay.getDate() + 1);
-        filter.scheduledDateTime.$lt = endOfDay;
+        filter.scheduledDateTime.$lte = new Date(dateTo);
       }
     }
 
