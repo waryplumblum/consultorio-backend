@@ -24,17 +24,17 @@ export class AppointmentsService {
   async create(
     createAppointmentDto: CreateAppointmentDto,
   ): Promise<AppointmentDocument> {
-    console.log(
-      'Service: Intentando crear nueva cita con DTO:',
-      createAppointmentDto,
-    );
+    // console.log(
+    //   'Service: Intentando crear nueva cita con DTO:',
+    //   createAppointmentDto,
+    // );
     const createdAppointment = new this.appointmentModel(createAppointmentDto);
     try {
       const savedAppointment = await createdAppointment.save();
-      console.log(
-        'Service: Cita guardada en DB exitosamente, ID:',
-        savedAppointment._id,
-      );
+      // console.log(
+      //   'Service: Cita guardada en DB exitosamente, ID:',
+      //   savedAppointment._id,
+      // );
 
       await this.mailService.sendAppointmentNotification(savedAppointment);
 
@@ -110,8 +110,8 @@ export class AppointmentsService {
     id: string,
     updateAppointmentDto: UpdateAppointmentDto,
   ): Promise<AppointmentDocument> {
-    console.log(`Service: Intentando actualizar cita con ID: ${id}`);
-    console.log('Service: Datos de actualización:', updateAppointmentDto);
+    // console.log(`Service: Intentando actualizar cita con ID: ${id}`);
+    // console.log('Service: Datos de actualización:', updateAppointmentDto);
 
     // Si tu DTO no tiene `updatedAt`, o si quieres asegurarte, puedes añadirlo aquí
     const dataToUpdate: any = {

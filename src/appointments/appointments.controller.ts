@@ -25,12 +25,12 @@ export class AppointmentsController {
   @Public()
   @Post()
   async create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    console.log('Controller: Recibida solicitud para crear una cita.');
-    console.log('Controller: DTO recibido:', createAppointmentDto);
+    // console.log('Controller: Recibida solicitud para crear una cita.');
+    // console.log('Controller: DTO recibido:', createAppointmentDto);
     try {
       const result =
         await this.appointmentsService.create(createAppointmentDto);
-      console.log('Controller: Cita creada exitosamente, ID:', result._id);
+      // console.log('Controller: Cita creada exitosamente, ID:', result._id);
       return result;
     } catch (error) {
       console.error('Controller: Error al crear la cita:', error.message);
@@ -85,19 +85,19 @@ export class AppointmentsController {
     @Param('id') id: string,
     @Body() updateAppointmentDto: UpdateAppointmentDto,
   ) {
-    console.log(
-      `Controller: Recibida solicitud para actualizar cita con ID: ${id}`,
-    );
-    console.log(
-      'Controller: DTO de actualización recibido:',
-      updateAppointmentDto,
-    );
+    // console.log(
+    //   `Controller: Recibida solicitud para actualizar cita con ID: ${id}`,
+    // );
+    // console.log(
+    //   'Controller: DTO de actualización recibido:',
+    //   updateAppointmentDto,
+    // );
     try {
       const result = await this.appointmentsService.update(
         id,
         updateAppointmentDto,
       );
-      console.log(`Controller: Cita con ID ${id} actualizada exitosamente.`);
+      // console.log(`Controller: Cita con ID ${id} actualizada exitosamente.`);
       return result;
     } catch (error) {
       console.error(
@@ -112,12 +112,12 @@ export class AppointmentsController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin', 'secretary')
   async remove(@Param('id') id: string) {
-    console.log(
-      `Controller: Recibida solicitud para eliminar cita con ID: ${id}`,
-    );
+    // console.log(
+    //   `Controller: Recibida solicitud para eliminar cita con ID: ${id}`,
+    // );
     try {
       const result = await this.appointmentsService.remove(id);
-      console.log(`Controller: Cita con ID ${id} eliminada exitosamente.`);
+      // console.log(`Controller: Cita con ID ${id} eliminada exitosamente.`);
       return result;
     } catch (error) {
       console.error(
