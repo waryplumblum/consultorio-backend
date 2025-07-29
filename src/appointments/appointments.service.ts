@@ -58,6 +58,7 @@ export class AppointmentsService {
       status,
       dateFrom,
       dateTo,
+      isDeleted,
     } = queryDto;
 
     const skip = (page - 1) * limit;
@@ -83,6 +84,10 @@ export class AppointmentsService {
       if (dateTo) {
         filter.scheduledDateTime.$lte = new Date(dateTo);
       }
+    }
+
+    if (!isDeleted) {
+      filter.isDeleted = false;
     }
 
     const [appointments, total] = await Promise.all([
@@ -136,17 +141,26 @@ export class AppointmentsService {
   }
 
   async remove(id: string): Promise<any> {
-    const result = await this.appointmentModel.deleteOne({ _id: id }).exec();
-    if (result.deletedCount === 0) {
+    const result = await this.appointmentModel
+      .findByIdAndUpdate(
+        id,
+        { $set: { isDeleted: true, updatedAt: new Date() } },
+        { new: true },
+      )
+      .exec();
+
+    if (!result) {
       throw new NotFoundException(
-        `Cita con ID "${id}" no encontrada para eliminar.`,
+        `Cita con ID "${id}" no encontrada para eliminar lógicamente.`,
       );
     }
-    return { message: `Cita con ID "${id}" eliminada exitosamente.` };
+    return {
+      message: `Cita con ID "${id}" marcada como eliminada exitosamente.`,
+    };
   }
 
   async countAllAppointments(): Promise<number> {
-    return this.appointmentModel.countDocuments().exec();
+    return this.appointmentModel.countDocuments({ isDeleted: false }).exec();
   }
 
   async findUpcomingAppointments(
@@ -157,6 +171,7 @@ export class AppointmentsService {
       .find({
         scheduledDateTime: { $gte: now },
         status: { $in: ['pending', 'confirmed'] }, // Considera solo citas pendientes o confirmadas
+        isDeleted: false, // ¡NUEVO! Excluir eliminadas lógicamente
       })
       .sort({ scheduledDateTime: 1 })
       .limit(limit) // Limita el número de resultados
@@ -169,6 +184,7 @@ export class AppointmentsService {
       .find({
         scheduledDateTime: { $gte: now },
         status: { $in: ['pending', 'confirmed'] },
+        isDeleted: false,
       })
       .sort({ scheduledDateTime: 1 })
       .exec();

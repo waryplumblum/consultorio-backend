@@ -1,5 +1,13 @@
 // src/appointments/dto/get-appointments.dto.ts
-import { IsOptional, IsString, IsNumber, IsIn, Min, Max } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsIn,
+  Min,
+  Max,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class GetAppointmentsDto {
@@ -45,4 +53,9 @@ export class GetAppointmentsDto {
   @IsString()
   @IsIn(['asc', 'desc'])
   sortOrder: 'asc' | 'desc' = 'desc'; // Orden de clasificación, por defecto ascendente
+
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean) // Importante para transformar 'true'/'false' de la URL a booleano
+  isDeleted?: boolean;
 }

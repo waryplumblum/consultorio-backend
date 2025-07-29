@@ -34,6 +34,9 @@ export class Appointment {
 
   @Prop({ default: Date.now })
   updatedAt: Date;
+
+  @Prop({ type: Boolean, default: false })
+  isDeleted: boolean;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);
