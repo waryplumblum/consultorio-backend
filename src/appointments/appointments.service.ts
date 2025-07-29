@@ -124,14 +124,14 @@ export class AppointmentsService {
       .exec();
 
     if (!existingAppointment) {
-      console.warn(
-        `Service: Cita con ID "${id}" no encontrada durante la actualización.`,
-      );
+      // console.warn(
+      //   `Service: Cita con ID "${id}" no encontrada durante la actualización.`,
+      // );
       throw new NotFoundException(
         `Cita con ID "${id}" no encontrada para actualizar.`,
       );
     }
-    console.log(`Service: Cita con ID ${id} actualizada en DB.`);
+    // console.log(`Service: Cita con ID ${id} actualizada en DB.`);
     return existingAppointment;
   }
 
