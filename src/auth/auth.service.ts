@@ -17,13 +17,13 @@ export class AuthService {
   ): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findByEmail(email);
 
-    if (!user || !user.isActive) {
-      return null;
+    if (!user || !user.isDeleted) {
+      throw new UnauthorizedException('Credenciales inválidas o usuario inactivo.'); // Mensaje genérico por seguridad
     }
 
     const isPasswordValid = await bcrypt.compare(pass, user.password);
     if (!isPasswordValid) {
-      return null;
+      throw new UnauthorizedException('Credenciales inválidas o usuario inactivo.'); // Mensaje genérico por seguridad
     }
 
     const userObject = user.toObject();

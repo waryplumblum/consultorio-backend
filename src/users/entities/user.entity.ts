@@ -8,13 +8,14 @@ export interface User extends Document { // <--- User ahora extiende Document
   firstName: string;
   lastName: string;
   role: 'admin' | 'secretary'; // Usa tipos literales para los roles
-  isActive: boolean;
+  //isActive: boolean;
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 @Schema()
-export class User implements User {
+export class User {
 
   _id: Types.ObjectId; 
   
@@ -33,8 +34,11 @@ export class User implements User {
   @Prop({ required: true, enum: ['admin', 'secretary'], default: 'secretary' })
   role: 'admin' | 'secretary';
 
-  @Prop({ default: true })
-  isActive: boolean; // Para activar o desactivar usuarios
+  // @Prop({ default: true }) // <-- ELIMINAMOS O MARCADO PARA ELIMINAR
+  // isActive: boolean;
+
+  @Prop({ default: false }) // <-- NUEVO: Por defecto, no está eliminado
+  isDeleted: boolean;
 
   @Prop({ default: Date.now })
   createdAt: Date;
@@ -45,10 +49,14 @@ export class User implements User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Opcional: Hook de Mongoose para actualizar `updatedAt` automáticamente
 UserSchema.pre('save', function (next) {
-  if (this.isModified()) {
+  if (this.isNew || this.isModified()) {
     this.updatedAt = new Date();
   }
+  next();
+});
+
+UserSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
+  this.set({ updatedAt: new Date() });
   next();
 });
